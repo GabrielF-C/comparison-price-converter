@@ -1,6 +1,8 @@
 // ==UserScript==
 // @name         Comparison Price Converter
-// @namespace    guab
+// @description  TamperMonkey script to convert comparison prices on the fly. Useful for groceries online !
+// @author       Gabriel Fournier-Cloutier
+// @namespace    https://github.com/GabrielF-C/comparison-price-converter
 // @version      1.0.0
 // @icon         https://img.icons8.com/?size=100&id=47442&format=png&color=40C057
 // @match        https://www.maxi.ca/*
