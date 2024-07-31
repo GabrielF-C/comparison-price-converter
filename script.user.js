@@ -180,6 +180,7 @@
       price: newPrice,
       quantity: storedParams.pickedQuantity,
       quantityUnit: pickedUnit.symbol,
+      element: cp.element
     };
   }
 
