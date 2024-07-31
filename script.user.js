@@ -4,7 +4,7 @@
 // @author       Gabriel Fournier-Cloutier
 // @icon         https://img.icons8.com/?size=100&id=47442&format=png&color=40C057
 
-// @version      1.0.1
+// @version      1.0.0
 // @namespace    https://github.com/GabrielF-C/comparison-price-converter
 
 // @resource     styles https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/css/styles.css
