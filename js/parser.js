@@ -90,8 +90,8 @@ class CP_ComparisonPriceParser {
             m = `0.${m}`;
           }
           m = m
-            .replace(/\-|\¢|\$|\s+/g, "")
-            .replace(/\,/g, ".")
+            .replace(/-|¢|\$|\s+/g, "")
+            .replace(/,/g, ".")
             .toLowerCase()
             .trim();
 

@@ -56,6 +56,7 @@ class CP_Unit {
    * @param {string} unitSymbol
    * @param {number} newQuantity
    * @param {CP_Unit} newUnit
+   * @returns {false | number}
    */
   static computeNewPrice(price, quantity, unitSymbol, newQuantity, newUnit) {
     if (!newUnit.conversionTable.hasOwnProperty(unitSymbol)) {
