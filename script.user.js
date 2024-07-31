@@ -3,9 +3,11 @@
 // @description  TamperMonkey script to convert comparison prices on the fly. Useful for groceries online !
 // @author       Gabriel Fournier-Cloutier
 // @icon         https://img.icons8.com/?size=100&id=47442&format=png&color=40C057
+// @namespace    https://github.com/GabrielF-C/comparison-price-converter
 
 // @version      1.0.0
-// @namespace    https://github.com/GabrielF-C/comparison-price-converter
+// @downloadURL  https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
+// @updateURL    https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
 
 // @resource     styles https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/css/styles.css
 
