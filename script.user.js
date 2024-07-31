@@ -93,11 +93,11 @@
 
       let comparisonPrice = cpParser.parseComparisonPriceFromElem(e.target);
       if (comparisonPrice) {
-        console.log("Before convert cp", JSON.stringify(comparisonPrice));
+        console.log("Before convert cp", ui.toDisplayString(comparisonPrice[0]));
         for (let i = 0; i < comparisonPrice.length; ++i) {
           comparisonPrice[i] = convertComparisonPrice(comparisonPrice[i]);
         }
-        console.log("Before show cp", JSON.stringify(comparisonPrice));
+        console.log("Before show cp", ui.toDisplayString(comparisonPrice[0]));
         ui.showComparisonPrice(comparisonPrice);
         console.log("Before highlight stuff");
         ui.removeAllHighlights();
@@ -130,7 +130,11 @@
   }
 
   function onQuantityChange(e, input) {
-    console.log("onQuantityChange");
+    console.log("onQuantityChange", {
+      v: input.value,
+      min: input.min,
+      max: input.max,
+    });
 
     if (
       parseFloat(input.value) < parseFloat(input.min) ||
