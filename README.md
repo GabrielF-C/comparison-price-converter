@@ -1,9 +1,6 @@
 # Comparison Price Converter
 
-## How to install
-
-- **Latest version** : [click here](https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js) to install
-- **Previous version** : [click here](https://github.com/GabrielF-C/comparison-price-converter/releases/) and pick a release
+[![Install Button]](https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js)
 
 <!--
 ## Features
@@ -11,3 +8,5 @@
 WIP
 
 -->
+
+[Install Button]: https://img.shields.io/badge/Install Script-EF2D5E?style=for-the-badge =white =DocuSign
