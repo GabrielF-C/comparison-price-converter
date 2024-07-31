@@ -93,11 +93,11 @@
 
       let comparisonPrice = cpParser.parseComparisonPriceFromElem(e.target);
       if (comparisonPrice) {
-        console.log("Before convert cp");
+        console.log("Before convert cp", comparisonPrice);
         for (let i = 0; i < comparisonPrice.length; ++i) {
           comparisonPrice[i] = convertComparisonPrice(comparisonPrice[i]);
         }
-        console.log("Before show cp");
+        console.log("Before show cp", comparisonPrice);
         ui.showComparisonPrice(comparisonPrice);
         console.log("Before highlight stuff");
         ui.removeAllHighlights();
