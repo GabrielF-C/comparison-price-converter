@@ -61,34 +61,45 @@
 
   function main() {
     // Init styles
+    console.log("Before add styles");
     GM_addStyle(GM_getResourceText("styles"));
 
     // Init UI
+    console.log("Before init UI");
     ui.init();
+    console.log("Before make draggable");
     makeDraggable(ui.displayElem, (top, left) => {
       storedParams.positionTop = top;
       storedParams.positionLeft = left;
     });
 
     // Init UI improvements
+    console.log("Before start apply UI improvements");
     if (siteSpecificParams.applyUIImprovements) {
       setInterval(() => {
+        console.log("Before applyUIImprovements");
         siteSpecificParams.applyUIImprovements();
       }, 2000);
     }
 
     // Init listeners
+    console.log("Before init listeners");
     document.addEventListener("mouseover", (e) => {
       if (ui.displayElem.contains(e.target) || storedParams.isMinimized) {
         return;
       }
 
+      console.log("Before parse cp");
+
       let comparisonPrice = cpParser.parseComparisonPriceFromElem(e.target);
       if (comparisonPrice) {
+        console.log("Before convert cp");
         for (let i = 0; i < comparisonPrice.length; ++i) {
           comparisonPrice[i] = convertComparisonPrice(comparisonPrice[i]);
         }
+        console.log("Before show cp");
         ui.showComparisonPrice(comparisonPrice);
+        console.log("Before highlight stuff");
         ui.removeAllHighlights();
         for (let cp of comparisonPrice) {
           ui.highlightElem(cp.element);
@@ -102,10 +113,13 @@
         e.preventDefault();
 
         if (storedParams.isMinimized) {
+          console.log("Before rclick maximize");
+
           ui.displayElem.querySelector("span").classList.remove("hidden");
           ui.displayElem.querySelector("img").classList.add("hidden");
           storedParams.isMinimized = false;
         } else {
+          console.log("Before rclick toggle unit picker");
           ui.toggleUnitPicker();
         }
 
@@ -116,6 +130,8 @@
   }
 
   function onQuantityChange(e, input) {
+    console.log("onQuantityChange");
+
     if (input.value < input.min || input.value > input.max) {
       input.value = storedParams.pickedQuantity;
     } else {
@@ -124,14 +140,21 @@
   }
 
   function onMassUnitChange(e, input) {
+    console.log("onMassUnitChange");
+
     storedParams.pickedMassUnit = input.id;
   }
 
   function onVolumeUnitChange(e, input) {
+    console.log("onVolumeUnitChange");
+
     storedParams.pickedVolumeUnit = input.id;
   }
 
   function onMinimize(e) {
+    console.log("onMinimize");
+
+
     storedParams.isMinimized = true;
     ui.removeAllHighlights();
     ui.toggleUnitPicker();
@@ -161,6 +184,8 @@
   }
 
   function getSiteSpecificParams() {
+    console.log("getSiteSpecificParams");
+
     switch (window.location.hostname) {
       case "www.walmart.ca":
         return makeParamsForWalmart();
