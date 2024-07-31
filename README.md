@@ -9,4 +9,4 @@ WIP
 
 -->
 
-[Install Button]: https://img.shields.io/badge/Install Script-EF2D5E?style=for-the-badge =white =DocuSign
+[Install Button]: https://img.shields.io/badge/Install&nbsp;Script-EF2D5E?style=for-the-badge&logoColor=white&logo=DocuSign
