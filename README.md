@@ -1,13 +1,9 @@
 # Comparison Price Converter
 
-## How to install
+[![Install Button]](https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js)
 
-WIP
+<!-- prettier-ignore-start -->
 
-## How to update
+[Install Button]: https://img.shields.io/badge/Install&nbsp;Script-EF2D5E?style=for-the-badge&logoColor=white&logo=DocuSign
 
-WIP
-
-## Features
-
-WIP
+<!-- prettier-ignore-end -->
