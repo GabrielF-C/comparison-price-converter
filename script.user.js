@@ -24,7 +24,7 @@
 // @match        https://www.walmart.ca/*
 // @match        https://www.gianttiger.com/*
 
-// @grant        none
+// @grant        GM_addStyle
 // ==/UserScript==
 
 (function () {
