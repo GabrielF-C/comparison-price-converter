@@ -99,7 +99,7 @@ class CP_UserInterface {
 
   #makeTextArea() {
     let span = document.createElement("span");
-    if (storedParams.isMinimized) {
+    if (this.#initialState.isMinimized) {
       span.classList.add("hidden");
     }
     span.innerText = this.displayElem.title;
