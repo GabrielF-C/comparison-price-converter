@@ -40,12 +40,12 @@ class CP_StoredParams {
     pickedMassUnit,
     pickedVolumeUnit
   ) {
-    sp.isMinimizedLazy = isMinimized;
-    sp.positionTopLazy = positionTop;
-    sp.positionLeftLazy = positionLeft;
-    sp.pickedQuantityLazy = pickedQuantity;
-    sp.pickedMassUnitLazy = pickedMassUnit;
-    sp.pickedVolumeUnitLazy = pickedVolumeUnit;
+    this.isMinimizedLazy = isMinimized;
+    this.positionTopLazy = positionTop;
+    this.positionLeftLazy = positionLeft;
+    this.pickedQuantityLazy = pickedQuantity;
+    this.pickedMassUnitLazy = pickedMassUnit;
+    this.pickedVolumeUnitLazy = pickedVolumeUnit;
   }
 
   get isMinimized() {
