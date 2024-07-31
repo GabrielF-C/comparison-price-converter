@@ -7,7 +7,7 @@
 // @version      1.0.1
 // @namespace    https://github.com/GabrielF-C/comparison-price-converter
 
-// @resource     https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/css/styles.css
+// @resource     styles https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/css/styles.css
 
 // @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/drag-and-drop.js
 // @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/parser.js
@@ -61,7 +61,7 @@
 
   function main() {
     // Init styles
-    GM_addStyle(GM_getResourceText("styles.css"));
+    GM_addStyle(GM_getResourceText("styles"));
 
     // Init UI
     ui.init();
