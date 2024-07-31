@@ -1,5 +1,12 @@
 class CP_StoredParams {
   #setCookie(cname, cvalue, exdays = 400) {
+    if (!navigator.cookieEnabled) {
+      console.warn(
+        "Converter: Could not set stored parameters in cookies because they are not enabled"
+      );
+      this[`_${cname}`] = cvalue;
+    }
+
     const d = new Date();
     d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
     let expires = "expires=" + d.toUTCString();
@@ -7,6 +14,13 @@ class CP_StoredParams {
   }
 
   #getCookie(cname) {
+    if (!navigator.cookieEnabled) {
+      console.warn(
+        "Converter: Could not get stored parameters from cookies because they are not enabled"
+      );
+      return this[`_${cname}`] ?? "";
+    }
+
     let name = cname + "=";
     let ca = document.cookie.split(";");
     for (const element of ca) {
