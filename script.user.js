@@ -25,6 +25,7 @@
 // @match        https://www.gianttiger.com/*
 
 // @grant        GM_addStyle
+// @grant        GM_getResourceText
 // ==/UserScript==
 
 (function () {
