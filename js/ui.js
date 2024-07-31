@@ -207,5 +207,6 @@ class CP_UserInterface {
     btn.type = "button";
     btn.innerText = "Minimiser";
     btn.addEventListener("click", this.#onMinimize);
+    return btn;
   }
 }
