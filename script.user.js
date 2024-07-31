@@ -132,7 +132,10 @@
   function onQuantityChange(e, input) {
     console.log("onQuantityChange");
 
-    if (input.value < input.min || input.value > input.max) {
+    if (
+      parseFloat(input.value) < parseFloat(input.min) ||
+      parseFloat(input.value) > parseFloat(input.max)
+    ) {
       input.value = storedParams.pickedQuantity;
     } else {
       storedParams.pickedQuantity = input.value;
