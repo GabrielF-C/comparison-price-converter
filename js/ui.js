@@ -204,6 +204,7 @@ class CP_UserInterface {
 
   #makeMinimizeButton() {
     let btn = document.createElement("button");
+    btn.classList.add("minimize-btn");
     btn.type = "button";
     btn.innerText = "Minimiser";
     btn.addEventListener("click", this.#onMinimize);

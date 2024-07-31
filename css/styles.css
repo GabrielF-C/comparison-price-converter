@@ -56,3 +56,12 @@
 .selected-for-conversion {
   background-color: #beffbe !important;
 }
+
+.minimize-btn {
+  cursor: pointer;
+  padding: 10px;
+  margin-top: 10px;
+  background-color: whitesmoke;
+  border-radius: 5px;
+  color: black;
+}
