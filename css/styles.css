@@ -15,6 +15,11 @@
   width: 35px;
 }
 
+#converter-comparison-price-display .item-title {
+  color: white !important;
+  margin: 0 !important;
+}
+
 .hidden {
   display: none !important;
 }
