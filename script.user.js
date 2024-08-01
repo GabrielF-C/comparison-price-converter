@@ -222,7 +222,7 @@
           3,
           `.item-product__content`,
           7,
-          `.item-product__brand`
+          `.js-ga-productname`
         );
 
       case "www.superc.ca":
