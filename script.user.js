@@ -18,6 +18,7 @@
 // @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/stored-params.js
 // @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/ui.js
 // @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/units.js
+// @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/items.js
 
 // @match        https://www.maxi.ca/*
 // @match        https://www.iga.net/*
