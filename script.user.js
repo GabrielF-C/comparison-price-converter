@@ -146,10 +146,22 @@
   }
 
   function convertComparisonPrice(cp) {
-    let pickedUnit =
-      CP_Unit.getCategory(cp.quantityUnit) === "mass"
-        ? CP_Unit.fromSymbol(storedParams.pickedMassUnit)
-        : CP_Unit.fromSymbol(storedParams.pickedVolumeUnit);
+    let cpUnitCategory = CP_Unit.getCategory(cp.quantityUnit);
+    let pickedUnit = null;
+
+    switch (cpUnitCategory) {
+      case "mass":
+        pickedUnit = CP_Unit.fromSymbol(storedParams.pickedMassUnit);
+        break;
+
+      case "volume":
+        pickedUnit = CP_Unit.fromSymbol(storedParams.pickedVolumeUnit);
+        break;
+
+      case "item":
+        // TODO: convert cp from item to mass
+        break;
+    }
 
     let newPrice = CP_Unit.computeNewPrice(
       cp.price,
@@ -162,7 +174,7 @@
     return {
       price: newPrice,
       quantity: storedParams.pickedQuantity,
-      quantityUnit: pickedUnit.symbol,
+      quantityUnit: pickedUnit?.symbol,
       element: cp.element,
     };
   }
