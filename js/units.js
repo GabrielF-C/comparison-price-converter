@@ -24,9 +24,9 @@ class CP_Unit {
   /**
    * @param {string} name
    * @param {string} symbol
-   * @param {CP_MassConversionTable | CP_VolumeConversionTable} conversionTable
+   * @param {CP_MassConversionTable | CP_VolumeConversionTable | null} conversionTable
    */
-  constructor(name, symbol, conversionTable) {
+  constructor(name, symbol, conversionTable = null) {
     this.name = name;
     this.symbol = symbol;
     this.conversionTable = conversionTable;
@@ -47,6 +47,11 @@ class CP_Unit {
       return "volume";
     }
 
+    u = CP_Unit.itemUnits.find((u) => u.symbol === symbol);
+    if (u) {
+      return "item";
+    }
+
     return "not supported";
   }
 
@@ -59,7 +64,7 @@ class CP_Unit {
    * @returns {false | number}
    */
   static computeNewPrice(price, quantity, unitSymbol, newQuantity, newUnit) {
-    if (!newUnit.conversionTable.hasOwnProperty(unitSymbol)) {
+    if (!newUnit?.conversionTable?.hasOwnProperty(unitSymbol)) {
       return false;
     }
 
@@ -77,7 +82,9 @@ class CP_Unit {
   }
 
   static get allUnits() {
-    return CP_Unit.massUnits.concat(CP_Unit.volumeUnits);
+    return CP_Unit.massUnits
+      .concat(CP_Unit.volumeUnits)
+      .concat(CP_Unit.itemUnits);
   }
 
   static get massUnits() {
@@ -143,6 +150,17 @@ class CP_Unit {
           l: 1,
         })
       ),
+    ];
+  }
+
+  static get itemUnits() {
+    return [
+      new CP_Unit("Chaque", "ch"),
+      new CP_Unit("Each", "ea"),
+      new CP_Unit("Unité", "un"),
+      new CP_Unit("Unité", "unité"),
+      new CP_Unit("Unité", "unite"),
+      new CP_Unit("Unit", "unit"),
     ];
   }
 }

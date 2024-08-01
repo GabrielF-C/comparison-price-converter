@@ -18,6 +18,7 @@
 // @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/stored-params.js
 // @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/ui.js
 // @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/units.js
+// @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/items.js
 
 // @match        https://www.maxi.ca/*
 // @match        https://www.iga.net/*
@@ -53,10 +54,13 @@
   const siteSpecificParams = getSiteSpecificParams();
   const regExps = new CP_RegExps(CP_Unit.allUnits.map((u) => u.symbol));
   const cpParser = new CP_ComparisonPriceParser(
+    regExps.comparisonPriceString,
+    regExps.comparisonPriceNumbers,
     siteSpecificParams.maxParentRecursionLevel,
     siteSpecificParams.maxChildRecursionLevel,
-    regExps.comparisonPriceString,
-    regExps.comparisonPriceNumbers
+    siteSpecificParams.itemTitleCommonAncestorSelector,
+    siteSpecificParams.itemTitleCommonAncestorDistance,
+    siteSpecificParams.itemTitleSelector
   );
 
   main();
@@ -85,14 +89,14 @@
         return;
       }
 
-      let comparisonPrice = cpParser.parseComparisonPriceFromElem(e.target);
-      if (comparisonPrice) {
-        for (let i = 0; i < comparisonPrice.length; ++i) {
-          comparisonPrice[i] = convertComparisonPrice(comparisonPrice[i]);
+      let comparisonPrices = cpParser.parseComparisonPricesFromElem(e.target);
+      if (comparisonPrices) {
+        for (let i = 0; i < comparisonPrices.length; ++i) {
+          comparisonPrices[i] = convertComparisonPrice(comparisonPrices[i]);
         }
-        ui.showComparisonPrice(comparisonPrice);
+        ui.showComparisonPrices(comparisonPrices);
         ui.removeAllHighlights();
-        for (let cp of comparisonPrice) {
+        for (let cp of comparisonPrices) {
           ui.highlightElem(cp.element);
         }
       }
@@ -104,7 +108,8 @@
         e.preventDefault();
 
         if (storedParams.isMinimized) {
-          ui.displayElem.querySelector("span").classList.remove("hidden");
+          ui.displayElem.querySelector(".item-title").classList.remove("hidden");
+          ui.priceDiplayElem.classList.remove("hidden");
           ui.displayElem.querySelector("img").classList.add("hidden");
           storedParams.isMinimized = false;
         } else {
@@ -140,15 +145,29 @@
     storedParams.isMinimized = true;
     ui.removeAllHighlights();
     ui.toggleUnitPicker();
-    ui.displayElem.querySelector("span").classList.add("hidden");
+    ui.displayElem.querySelector(".item-title").classList.add("hidden");
+    ui.priceDiplayElem.classList.add("hidden");
     ui.displayElem.querySelector("img").classList.remove("hidden");
   }
 
   function convertComparisonPrice(cp) {
-    let pickedUnit =
-      CP_Unit.getCategory(cp.quantityUnit) === "mass"
-        ? CP_Unit.fromSymbol(storedParams.pickedMassUnit)
-        : CP_Unit.fromSymbol(storedParams.pickedVolumeUnit);
+    let cpUnitCategory = CP_Unit.getCategory(cp.quantityUnit);
+    let pickedUnit = null;
+
+    switch (cpUnitCategory) {
+      case "mass":
+        pickedUnit = CP_Unit.fromSymbol(storedParams.pickedMassUnit);
+        break;
+
+      case "volume":
+        pickedUnit = CP_Unit.fromSymbol(storedParams.pickedVolumeUnit);
+        break;
+
+      case "item":
+        // TODO: convert cp from item to mass
+        pickedUnit = CP_Unit.fromSymbol(storedParams.pickedMassUnit);
+        break;
+    }
 
     let newPrice = CP_Unit.computeNewPrice(
       cp.price,
@@ -161,24 +180,61 @@
     return {
       price: newPrice,
       quantity: storedParams.pickedQuantity,
-      quantityUnit: pickedUnit.symbol,
+      quantityUnit: pickedUnit?.symbol,
       element: cp.element,
     };
   }
 
   function getSiteSpecificParams() {
     switch (window.location.hostname) {
+      case "www.maxi.ca":
+        return new CP_SiteSpecificParams(
+          2,
+          3,
+          `.product-tile__details__info`,
+          7,
+          `.product-tile__details__info__name__link`
+        );
+
+      case "www.iga.net":
+        return new CP_SiteSpecificParams(
+          2,
+          3,
+          `.item-product__content`,
+          7,
+          `.item-product__brand`
+        );
+
+      case "www.superc.ca":
+      case "www.metro.ca":
+        return new CP_SiteSpecificParams(
+          2,
+          3,
+          `.pt__content--wrap`,
+          7,
+          `.content__head`
+        );
+
       case "www.walmart.ca":
         return makeParamsForWalmart();
+
       case "www.gianttiger.com":
         return makeParamsForGiantTiger();
 
       default:
-        return new CP_SiteSpecificParams(2, 3);
+        throw new Error(
+          `Converter: No site specific params are defined for '${window.location.hostname}'`
+        );
     }
 
     function makeParamsForWalmart() {
-      return new CP_SiteSpecificParams(2, 10, () => {
+      return new CP_SiteSpecificParams(
+        2,
+        10,
+        `[data-testid="list-view"]`,
+        7,
+        `[data-automation-id="product-title"]`,
+        () => {
         for (let productElem of document.querySelectorAll(
           `[data-item-id] [data-testid="list-view"] > div > div:nth-child(2)`
         )) {
@@ -213,16 +269,16 @@
           }
 
           // Parse, convert and display comparison price
-          let comparisonPrice = cpParser.parseComparisonPriceFromString(
+            let comparisonPrices = cpParser.parseComparisonPricesFromString(
             `${priceElem.innerText} / ${quantityMatches[0]}`
           );
 
-          if (!comparisonPrice) {
+            if (!comparisonPrices) {
             continue;
           }
 
           div.innerText = ui.toDisplayString(
-            convertComparisonPrice(comparisonPrice[0])
+              convertComparisonPrice(comparisonPrices[0])
           );
 
           // Remove some UI elems
@@ -262,11 +318,18 @@
           // Insert comparison price
           priceElem.after(div);
         }
-      });
+        }
+      );
     }
 
     function makeParamsForGiantTiger() {
-      return new CP_SiteSpecificParams(2, 10, () => {
+      return new CP_SiteSpecificParams(
+        2,
+        10,
+        `.product-tile__content`,
+        7,
+        `h2.product-tile__title body-bold-sm`,
+        () => {
         for (let titleElem of document.querySelectorAll(
           ".product-tile__title"
         )) {
@@ -288,18 +351,19 @@
             regExps.giantTigerQuantity
           );
           if (quantityMatches?.length) {
-            let comparisonPrice = cpParser.parseComparisonPriceFromString(
+              let comparisonPrices = cpParser.parseComparisonPricesFromString(
               `${priceElem.innerText} / ${quantityMatches[0]}`
             );
-            if (comparisonPrice) {
+              if (comparisonPrices) {
               div.innerText = ui.toDisplayString(
-                convertComparisonPrice(comparisonPrice[0])
+                  convertComparisonPrice(comparisonPrices[0])
               );
               priceElem.after(div);
             }
           }
         }
-      });
+        }
+      );
     }
   }
 })();

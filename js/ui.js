@@ -9,6 +9,13 @@ class CP_UserInterface {
 
   displayElem;
 
+  get itemTitleElem() {
+    return this.displayElem.querySelector(".item-title");
+  }
+  get priceDiplayElem() {
+    return this.displayElem.querySelector("span");
+  }
+
   /**
    *
    * @param {{positionTop: number, positionLeft: number, isMinimized: boolean, pickedQuantity: number, pickedMassUnit: string, pickedVolumeUnit: string}} initialState
@@ -37,7 +44,8 @@ class CP_UserInterface {
 
   init() {
     this.displayElem = this.#makeDisplayElem();
-    this.displayElem.append(this.#makeTextArea());
+    this.displayElem.append(this.#makeItemTitleDisplayArea());
+    this.displayElem.append(this.#makePriceDisplayArea());
     this.displayElem.append(this.#makeMinimizedIcon());
     this.displayElem.append(this.#makeUnitPicker());
 
@@ -48,21 +56,27 @@ class CP_UserInterface {
     this.displayElem.classList.toggle("drag-enabled");
     this.displayElem.classList.toggle("move-cursor");
     this.displayElem.querySelector(".unit-picker").classList.toggle("hidden");
-    this.displayElem.querySelector("span").classList.toggle("hidden");
+    this.itemTitleElem.classList.toggle("hidden");
+    this.priceDiplayElem.classList.toggle("hidden");
   }
 
   /**
-   * @param {{ price: number, quantity: number, quantityUnit: string }[]} comparisonPrice
+   * @param {{ price: number, quantity: number, quantityUnit: string, element: HTMLElement, itemTitle: string | false }[]} comparisonPrices
    */
-  showComparisonPrice(comparisonPrice) {
-    this.displayElem.querySelector("span").innerText = "";
+  showComparisonPrices(comparisonPrices) {
+    this.priceDiplayElem.innerText = "";
+    if (comparisonPrices[0].itemTitle) {
+      this.itemTitleElem.innerText = comparisonPrices[0].itemTitle;
+    } else {
+      this.itemTitleElem.innerText = "";
+    }
 
     let shownPrices = [];
-    for (let cp of comparisonPrice) {
+    for (let cp of comparisonPrices) {
       let priceStr = this.toDisplayString(cp);
       if (!shownPrices.includes(priceStr)) {
         shownPrices.push(priceStr);
-        this.displayElem.querySelector("span").innerText += `${priceStr}\n`;
+        this.priceDiplayElem.innerText += `${priceStr}\n`;
       }
     }
   }
@@ -97,7 +111,16 @@ class CP_UserInterface {
     return div;
   }
 
-  #makeTextArea() {
+  #makeItemTitleDisplayArea() {
+    let p = document.createElement("p");
+    p.className.add("item-title");
+    if (this.#initialState.isMinimized) {
+      p.classList.add("hidden");
+    }
+    return p;
+  }
+
+  #makePriceDisplayArea() {
     let span = document.createElement("span");
     if (this.#initialState.isMinimized) {
       span.classList.add("hidden");
