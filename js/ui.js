@@ -61,12 +61,20 @@ class CP_UserInterface {
   }
 
   /**
-   * @param {{ price: number, quantity: number, quantityUnit: string, element: HTMLElement, itemTitle: string | false }[]} comparisonPrices
+   * @param {false | { price: number, quantity: number, quantityUnit: string, element: HTMLElement, itemTitle: string | false }[]} comparisonPrices
    */
   showComparisonPrices(comparisonPrices) {
+    if (!comparisonPrices?.length) {
+      return;
+    }
+
     this.priceDiplayElem.innerText = "";
     if (comparisonPrices[0].itemTitle) {
-      this.itemTitleElem.innerText = comparisonPrices[0].itemTitle;
+      let cleanItemTitle = comparisonPrices[0].itemTitle.trim();
+      if (cleanItemTitle.length > 50) {
+        cleanItemTitle = cleanItemTitle.substring(0, 50) + "...";
+      }
+      this.itemTitleElem.innerText = cleanItemTitle;
     } else {
       this.itemTitleElem.innerText = "";
     }
@@ -85,9 +93,14 @@ class CP_UserInterface {
    * @param {{ price: number, quantity: number, quantityUnit: string }} comparisonPrice
    */
   toDisplayString(comparisonPrice) {
-    return `${comparisonPrice.price.toPrecision(3)}$ / ${
-      comparisonPrice.quantity
-    }${comparisonPrice.quantityUnit}`;
+    if (!comparisonPrice) {
+      return "???";
+    }
+
+    let p = comparisonPrice.price
+      ? comparisonPrice.price.toPrecision(3)
+      : "???";
+    return `${p}$ / ${comparisonPrice.quantity}${comparisonPrice.quantityUnit}`;
   }
 
   removeAllHighlights() {
@@ -97,7 +110,7 @@ class CP_UserInterface {
   }
 
   highlightElem(elem) {
-    elem.classList.add("selected-for-conversion");
+    elem?.classList.add("selected-for-conversion");
   }
 
   #makeDisplayElem() {

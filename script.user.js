@@ -94,6 +94,7 @@
         for (let i = 0; i < comparisonPrices.length; ++i) {
           comparisonPrices[i] = convertComparisonPrice(comparisonPrices[i]);
         }
+
         ui.showComparisonPrices(comparisonPrices);
         ui.removeAllHighlights();
         for (let cp of comparisonPrices) {
@@ -108,7 +109,9 @@
         e.preventDefault();
 
         if (storedParams.isMinimized) {
-          ui.displayElem.querySelector(".item-title").classList.remove("hidden");
+          ui.displayElem
+            .querySelector(".item-title")
+            .classList.remove("hidden");
           ui.priceDiplayElem.classList.remove("hidden");
           ui.displayElem.querySelector("img").classList.add("hidden");
           storedParams.isMinimized = false;
@@ -163,25 +166,42 @@
         pickedUnit = CP_Unit.fromSymbol(storedParams.pickedVolumeUnit);
         break;
 
-      case "item":
-        // TODO: convert cp from item to mass
+      case "item": {
+        // Always use picked mass unit as target for item conversion
+        let item = CP_Item.find(cp.itemTitle);
+
+        if (item) {
+          cp.itemTitle =
+            `(${item.avgMass.toPrecision(3)}${CP_Item.massUnit} / item)\n` +
+            cp.itemTitle;
+          cp.quantity = item.avgMass;
+        } else {
+          cp.price = false;
+        }
+
+        cp.quantityUnit = CP_Item.massUnit;
         pickedUnit = CP_Unit.fromSymbol(storedParams.pickedMassUnit);
         break;
+      }
     }
 
-    let newPrice = CP_Unit.computeNewPrice(
-      cp.price,
-      cp.quantity,
-      cp.quantityUnit,
-      storedParams.pickedQuantity,
-      pickedUnit
-    );
+    let newPrice;
+    if (cp.price) {
+      newPrice = CP_Unit.computeNewPrice(
+        cp.price,
+        cp.quantity,
+        cp.quantityUnit,
+        storedParams.pickedQuantity,
+        pickedUnit
+      );
+    }
 
     return {
       price: newPrice,
       quantity: storedParams.pickedQuantity,
       quantityUnit: pickedUnit?.symbol,
       element: cp.element,
+      itemTitle: cp.itemTitle,
     };
   }
 
@@ -212,7 +232,7 @@
           3,
           `.pt__content--wrap`,
           7,
-          `.content__head`
+          `.head__title`
         );
 
       case "www.walmart.ca":
@@ -235,89 +255,89 @@
         7,
         `[data-automation-id="product-title"]`,
         () => {
-        for (let productElem of document.querySelectorAll(
-          `[data-item-id] [data-testid="list-view"] > div > div:nth-child(2)`
-        )) {
-          if (productElem.querySelector(".injected-comparison-price")) {
-            continue;
-          }
-
-          let priceElem = productElem.querySelector(
-            `[data-automation-id="product-price"] > div:nth-child(1)`
-          );
-          let titleElem = productElem.querySelector(
-            `[data-automation-id="product-title"]`
-          );
-
-          let div = document.createElement("div");
-          div.classList.add("injected-comparison-price");
-          div.style.flex = "1";
-
-          // Get quantity from title, try each regex until we get a match
-          let quantityRegExps = regExps.walmartQuantity;
-          let quantityMatches = [];
-          for (let reg of quantityRegExps) {
-            quantityMatches = titleElem.innerText.match(reg);
-            if (quantityMatches?.length) {
-              break;
-            }
-          }
-
-          // Check if we found a quantity in the title
-          if (!quantityMatches?.length) {
-            continue;
-          }
-
-          // Parse, convert and display comparison price
-            let comparisonPrices = cpParser.parseComparisonPricesFromString(
-            `${priceElem.innerText} / ${quantityMatches[0]}`
-          );
-
-            if (!comparisonPrices) {
-            continue;
-          }
-
-          div.innerText = ui.toDisplayString(
-              convertComparisonPrice(comparisonPrices[0])
-          );
-
-          // Remove some UI elems
-          for (
-            let elem = priceElem.nextSibling;
-            elem;
-            elem = elem.nextSibling
-          ) {
-            if (elem.nodeName === "#text") {
+          for (let productElem of document.querySelectorAll(
+            `[data-item-id] [data-testid="list-view"] > div > div:nth-child(2)`
+          )) {
+            if (productElem.querySelector(".injected-comparison-price")) {
               continue;
             }
 
-            let removeElem = true;
-            let stringsToKeep = [
-              "prix moyen",
-              "coût final au poids",
-              "avg price",
-              "final cost by weight",
-            ];
-            for (let str of stringsToKeep) {
-              if (elem.innerText?.toLowerCase().trim().includes(str)) {
-                removeElem = false;
+            let priceElem = productElem.querySelector(
+              `[data-automation-id="product-price"] > div:nth-child(1)`
+            );
+            let titleElem = productElem.querySelector(
+              `[data-automation-id="product-title"]`
+            );
+
+            let div = document.createElement("div");
+            div.classList.add("injected-comparison-price");
+            div.style.flex = "1";
+
+            // Get quantity from title, try each regex until we get a match
+            let quantityRegExps = regExps.walmartQuantity;
+            let quantityMatches = [];
+            for (let reg of quantityRegExps) {
+              quantityMatches = titleElem.innerText.match(reg);
+              if (quantityMatches?.length) {
                 break;
               }
             }
 
-            if (removeElem) {
-              elem.classList.add("marked-for-deletion-by-converter");
+            // Check if we found a quantity in the title
+            if (!quantityMatches?.length) {
+              continue;
             }
-          }
-          for (let elem of document.querySelectorAll(
-            ".marked-for-deletion-by-converter"
-          )) {
-            elem.remove();
-          }
 
-          // Insert comparison price
-          priceElem.after(div);
-        }
+            // Parse, convert and display comparison price
+            let comparisonPrices = cpParser.parseComparisonPricesFromString(
+              `${priceElem.innerText} / ${quantityMatches[0]}`
+            );
+
+            if (!comparisonPrices) {
+              continue;
+            }
+
+            div.innerText = ui.toDisplayString(
+              convertComparisonPrice(comparisonPrices[0])
+            );
+
+            // Remove some UI elems
+            for (
+              let elem = priceElem.nextSibling;
+              elem;
+              elem = elem.nextSibling
+            ) {
+              if (elem.nodeName === "#text") {
+                continue;
+              }
+
+              let removeElem = true;
+              let stringsToKeep = [
+                "prix moyen",
+                "coût final au poids",
+                "avg price",
+                "final cost by weight",
+              ];
+              for (let str of stringsToKeep) {
+                if (elem.innerText?.toLowerCase().trim().includes(str)) {
+                  removeElem = false;
+                  break;
+                }
+              }
+
+              if (removeElem) {
+                elem.classList.add("marked-for-deletion-by-converter");
+              }
+            }
+            for (let elem of document.querySelectorAll(
+              ".marked-for-deletion-by-converter"
+            )) {
+              elem.remove();
+            }
+
+            // Insert comparison price
+            priceElem?.parentElement?.after(div);
+          }
         }
       );
     }
@@ -330,38 +350,38 @@
         7,
         `h2.product-tile__title body-bold-sm`,
         () => {
-        for (let titleElem of document.querySelectorAll(
-          ".product-tile__title"
-        )) {
-          let parent = titleElem.parentElement;
-          let priceElem = parent?.querySelector("span.price__value");
+          for (let titleElem of document.querySelectorAll(
+            ".product-tile__title"
+          )) {
+            let parent = titleElem.parentElement;
+            let priceElem = parent?.querySelector("span.price__value");
 
-          if (
-            parent?.querySelector(".injected-comparison-price") ||
-            !priceElem
-          ) {
-            continue;
-          }
+            if (
+              parent?.querySelector(".injected-comparison-price") ||
+              !priceElem
+            ) {
+              continue;
+            }
 
-          let div = document.createElement("div");
-          div.classList.add("injected-comparison-price");
+            let div = document.createElement("div");
+            div.classList.add("injected-comparison-price");
 
-          // Get quantity from title
-          let quantityMatches = titleElem.innerText.match(
-            regExps.giantTigerQuantity
-          );
-          if (quantityMatches?.length) {
-              let comparisonPrices = cpParser.parseComparisonPricesFromString(
-              `${priceElem.innerText} / ${quantityMatches[0]}`
+            // Get quantity from title
+            let quantityMatches = titleElem.innerText.match(
+              regExps.giantTigerQuantity
             );
-              if (comparisonPrices) {
-              div.innerText = ui.toDisplayString(
-                  convertComparisonPrice(comparisonPrices[0])
+            if (quantityMatches?.length) {
+              let comparisonPrices = cpParser.parseComparisonPricesFromString(
+                `${priceElem.innerText} / ${quantityMatches[0]}`
               );
-              priceElem.after(div);
+              if (comparisonPrices) {
+                div.innerText = ui.toDisplayString(
+                  convertComparisonPrice(comparisonPrices[0])
+                );
+                priceElem.after(div);
+              }
             }
           }
-        }
         }
       );
     }
