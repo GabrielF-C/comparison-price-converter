@@ -113,7 +113,7 @@ class CP_UserInterface {
 
   #makeItemTitleDisplayArea() {
     let p = document.createElement("p");
-    p.className.add("item-title");
+    p.classList.add("item-title");
     if (this.#initialState.isMinimized) {
       p.classList.add("hidden");
     }
