@@ -1,4 +1,3 @@
-
 function makeDraggable(elmnt, onPosChange) {
   let pos1 = 0,
     pos2 = 0,

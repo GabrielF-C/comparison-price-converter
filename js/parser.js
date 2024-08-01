@@ -51,7 +51,7 @@ class CP_ComparisonPriceParser {
 
       if (comparisonPrices) {
         let itemTitle = this.#findItemTitleForCP(elem);
-        for (let cp of comparisonPrices) {
+        for (const cp of comparisonPrices) {
           cp.element = elem;
           cp.itemTitle = itemTitle;
         }
