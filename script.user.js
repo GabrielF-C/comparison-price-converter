@@ -53,7 +53,9 @@
     onVolumeUnitChange,
     onMinimize
   );
-  const siteSpecificParams = getSiteSpecificParams();
+  const siteSpecificParams = getSiteSpecificParams(
+    CONVERTER_TEST ? "test" : window.location.hostname
+  );
   const regExps = new CP_RegExps(CP_Unit.allUnits.map((u) => u.symbol));
   const cpParser = new CP_ComparisonPriceParser(
     regExps.comparisonPriceString,
@@ -209,8 +211,8 @@
     };
   }
 
-  function getSiteSpecificParams() {
-    switch (window.location.hostname) {
+  function getSiteSpecificParams(hostName) {
+    switch (hostName) {
       case "www.maxi.ca":
         return new CP_SiteSpecificParams(
           2,
@@ -245,9 +247,12 @@
       case "www.gianttiger.com":
         return makeParamsForGiantTiger();
 
+      case "test":
+        return CONVERTER_TEST.siteSpecificParams;
+
       default:
         throw new Error(
-          `Converter: No site specific params are defined for '${window.location.hostname}'`
+          `Converter: No site specific params are defined for '${hostName}'`
         );
     }
 
