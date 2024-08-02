@@ -11,6 +11,7 @@
 
 // @resource     styles https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/css/styles.css
 
+// @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/logger.js
 // @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/drag-and-drop.js
 // @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/parser.js
 // @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/regular-expressions.js
@@ -34,7 +35,9 @@
 (function () {
   "use strict";
 
+  const logger = new CP_Logger("[CONVERTER]", () => CONVERTER_TEST);
   const storedParams = new CP_StoredParams(
+    logger,
     false,
     100,
     60,
@@ -51,7 +54,9 @@
     onVolumeUnitChange,
     onMinimize
   );
-  const siteSpecificParams = getSiteSpecificParams();
+  const siteSpecificParams = getSiteSpecificParams(
+    CONVERTER_TEST ? "test" : window.location.hostname
+  );
   const regExps = new CP_RegExps(CP_Unit.allUnits.map((u) => u.symbol));
   const cpParser = new CP_ComparisonPriceParser(
     regExps.comparisonPriceString,
@@ -90,10 +95,12 @@
       }
 
       let comparisonPrices = cpParser.parseComparisonPricesFromElem(e.target);
+      logger.info("PARSED " + JSON.stringify(comparisonPrices), true);
       if (comparisonPrices) {
         for (let i = 0; i < comparisonPrices.length; ++i) {
           comparisonPrices[i] = convertComparisonPrice(comparisonPrices[i]);
         }
+        logger.info("CONVERTED " + JSON.stringify(comparisonPrices), true);
 
         ui.showComparisonPrices(comparisonPrices);
         ui.removeAllHighlights();
@@ -205,8 +212,8 @@
     };
   }
 
-  function getSiteSpecificParams() {
-    switch (window.location.hostname) {
+  function getSiteSpecificParams(hostName) {
+    switch (hostName) {
       case "www.maxi.ca":
         return new CP_SiteSpecificParams(
           2,
@@ -241,9 +248,12 @@
       case "www.gianttiger.com":
         return makeParamsForGiantTiger();
 
+      case "test":
+        return CONVERTER_TEST.siteSpecificParams;
+
       default:
         throw new Error(
-          `Converter: No site specific params are defined for '${window.location.hostname}'`
+          `Converter: No site specific params are defined for '${hostName}'`
         );
     }
 
