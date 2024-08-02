@@ -11,6 +11,7 @@
 
 // @resource     styles https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/css/styles.css
 
+// @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/utils.js
 // @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/logger.js
 // @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/drag-and-drop.js
 // @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/parser.js
@@ -95,12 +96,12 @@
       }
 
       let comparisonPrices = cpParser.parseComparisonPricesFromElem(e.target);
-      logger.info("PARSED " + JSON.stringify(comparisonPrices), true);
+      logger.info("PARSED " + stringify(comparisonPrices), true);
       if (comparisonPrices) {
         for (let i = 0; i < comparisonPrices.length; ++i) {
           comparisonPrices[i] = convertComparisonPrice(comparisonPrices[i]);
         }
-        logger.info("CONVERTED " + JSON.stringify(comparisonPrices), true);
+        logger.info("CONVERTED " + stringify(comparisonPrices), true);
 
         ui.showComparisonPrices(comparisonPrices);
         ui.removeAllHighlights();
