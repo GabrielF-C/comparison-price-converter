@@ -1,0 +1,31 @@
+body {
+  font-family: "Roboto", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.products {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.product {
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px;
+  width: 300px;
+}
+
+.product-image {
+}
+
+.product-content {
+}
+
+.product-title {
+}
+
+.product-price {
+}
