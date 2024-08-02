@@ -35,7 +35,7 @@
 (function () {
   "use strict";
 
-  const logger = new CP_Logger("[CONVERTER]", () => CONVERTER_TEST);
+  const logger = new CP_Logger("[CONVERTER]", isDebugModeEnabled);
   const storedParams = new CP_StoredParams(
     logger,
     false,
@@ -55,7 +55,7 @@
     onMinimize
   );
   const siteSpecificParams = getSiteSpecificParams(
-    CONVERTER_TEST ? "test" : window.location.hostname
+    isDebugModeEnabled() ? "test" : window.location.hostname
   );
   const regExps = new CP_RegExps(CP_Unit.allUnits.map((u) => u.symbol));
   const cpParser = new CP_ComparisonPriceParser(
@@ -158,6 +158,10 @@
     ui.displayElem.querySelector(".item-title").classList.add("hidden");
     ui.priceDiplayElem.classList.add("hidden");
     ui.displayElem.querySelector("img").classList.remove("hidden");
+  }
+
+  function isDebugModeEnabled() {
+    return typeof CONVERTER_TEST !== "undefined";
   }
 
   function convertComparisonPrice(cp) {
