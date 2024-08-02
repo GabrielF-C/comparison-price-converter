@@ -1,23 +1,29 @@
 class CP_StoredParams {
-  #setCookie(cname, cvalue, exdays = 400) {
-    if (!navigator.cookieEnabled) {
-      console.warn(
-        "Converter: Could not set stored parameters in cookies because they are not enabled"
-      );
-      this[`_${cname}`] = cvalue;
-    }
+  #failedToSetCookies = false;
+  #logger;
 
+  #setCookie(cname, cvalue, exdays = 400) {
     const d = new Date();
     d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
     let expires = "expires=" + d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+
+    if (this.#failedToSetCookies) {
+      this[`_${cname}`] = cvalue;
+    } else {
+      document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }
+
+    if (!this.#failedToSetCookies && !document.cookie?.length) {
+      this.#logger.warn(
+        "Could not set stored parameters in cookies. Params will not be stored between page reloads."
+      );
+      this.#failedToSetCookies = true;
+      this[`_${cname}`] = cvalue;
+    }
   }
 
   #getCookie(cname) {
-    if (!navigator.cookieEnabled) {
-      console.warn(
-        "Converter: Could not get stored parameters from cookies because they are not enabled"
-      );
+    if (this.#failedToSetCookies) {
       return this[`_${cname}`] ?? "";
     }
 
@@ -46,7 +52,17 @@ class CP_StoredParams {
       this.#setCookie(this.#getCookieName(paramName), val);
   }
 
+  /**
+   * @param {CP_Logger} logger
+   * @param {boolean} isMinimized
+   * @param {number} positionTop
+   * @param {number} positionLeft
+   * @param {number} pickedQuantity
+   * @param {string} pickedMassUnit
+   * @param {string} pickedVolumeUnit
+   */
   constructor(
+    logger,
     isMinimized,
     positionTop,
     positionLeft,
@@ -54,6 +70,7 @@ class CP_StoredParams {
     pickedMassUnit,
     pickedVolumeUnit
   ) {
+    this.#logger = logger;
     this.isMinimizedLazy = isMinimized;
     this.positionTopLazy = positionTop;
     this.positionLeftLazy = positionLeft;

@@ -37,6 +37,7 @@
 
   const logger = new CP_Logger("[CONVERTER]", () => CONVERTER_TEST);
   const storedParams = new CP_StoredParams(
+    logger,
     false,
     100,
     60,
