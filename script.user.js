@@ -38,7 +38,7 @@
   const logger = new CP_Logger("[CONVERTER]", isDebugModeEnabled);
   const storedParams = new CP_StoredParams(
     logger,
-    false,
+    true,
     100,
     60,
     100,
