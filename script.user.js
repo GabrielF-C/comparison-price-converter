@@ -5,7 +5,7 @@
 // @icon         https://img.icons8.com/?size=100&id=47442&format=png&color=40C057
 // @namespace    https://github.com/GabrielF-C/comparison-price-converter
 
-// @version      20240801_1518
+// @version      20241001_1000
 // @downloadURL  https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
 // @updateURL    https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
 
@@ -220,9 +220,9 @@
         return new CP_SiteSpecificParams(
           2,
           3,
-          `.product-tile__details__info`,
+          `.chakra-linkbox:has([data-testid="product-image"])`,
           7,
-          `.product-tile__details__info__name__link`
+          `[data-testid="product-title"]`
         );
 
       case "www.iga.net":
