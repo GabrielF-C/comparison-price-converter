@@ -32,7 +32,7 @@ $fileContents = file_get_contents($targetFile);
 
 $now = new DateTime();
 
-$versionNumber = $now->format("ymd_His");
+$versionNumber = $now->format("Ymd_His");
 $versionRegex = "/(?<=\/\/\s@version\s).*/";
 
 log_info("File", $targetFile);
