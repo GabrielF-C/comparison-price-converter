@@ -5,7 +5,7 @@
 // @icon         https://img.icons8.com/?size=100&id=47442&format=png&color=40C057
 // @namespace    https://github.com/GabrielF-C/comparison-price-converter
 
-// @version      20241001_2204
+// @version      20241001_1009
 // @downloadURL  https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
 // @updateURL    https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
 
@@ -40,7 +40,7 @@
   const storedParams = new CP_StoredParams(
     logger,
     {
-      version: GM_info?.version,
+      version: GM_info?.script?.version,
       isMinimized: true,
       positionTop: 100,
       positionLeft: 60,
@@ -76,7 +76,7 @@
 
   function main() {
     // Reset stored params if the version is different
-    if (GM_info?.version !== storedParams.version) {
+    if (GM_info?.script?.version !== storedParams.version) {
       logger.info("Resetting stored params (new version)");
       storedParams.reset();
     }
