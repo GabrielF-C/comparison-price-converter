@@ -1,3 +1,5 @@
+GM_info = {};
+
 function GM_addStyle() {
   return undefined;
 }

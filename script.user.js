@@ -5,7 +5,7 @@
 // @icon         https://img.icons8.com/?size=100&id=47442&format=png&color=40C057
 // @namespace    https://github.com/GabrielF-C/comparison-price-converter
 
-// @version      20241001_1017
+// @version      20241001_2204
 // @downloadURL  https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
 // @updateURL    https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
 
@@ -30,6 +30,7 @@
 
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
+// @grant        GM_info
 // ==/UserScript==
 
 (function () {
@@ -74,6 +75,12 @@
   main();
 
   function main() {
+    // Reset stored params if the version is different
+    if (GM_info?.version !== storedParams.version) {
+      logger.info("Resetting stored params (new version)");
+      storedParams.reset();
+    }
+
     // Init styles
     GM_addStyle(GM_getResourceText("styles"));
 
