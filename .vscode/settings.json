@@ -1,4 +1,5 @@
 {
     "editor.tabSize": 2,
-    "java.inlayHints.parameterNames.enabled": "all"
+    "java.inlayHints.parameterNames.enabled": "all",
+    "git.branchProtectionPrompt": "alwaysCommit"
 }
