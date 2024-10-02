@@ -38,12 +38,15 @@
   const logger = new CP_Logger("[CONVERTER]", isDebugModeEnabled);
   const storedParams = new CP_StoredParams(
     logger,
-    true,
-    100,
-    60,
-    100,
-    CP_Unit.massUnits[0].symbol,
-    CP_Unit.volumeUnits[0].symbol
+    {
+      version: GM_info?.version,
+      isMinimized: true,
+      positionTop: 100,
+      positionLeft: 60,
+      pickedQuantity: 100,
+      pickedMassUnit: CP_Unit.massUnits[0].symbol,
+      pickedVolumeUnit: CP_Unit.volumeUnits[0].symbol
+    }
   );
   const ui = new CP_UserInterface(
     storedParams,
