@@ -5,7 +5,7 @@
 // @icon         https://img.icons8.com/?size=100&id=47442&format=png&color=40C057
 // @namespace    https://github.com/GabrielF-C/comparison-price-converter
 
-// @version      20241001_1017
+// @version      20241001_2204
 // @downloadURL  https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
 // @updateURL    https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
 
@@ -30,6 +30,7 @@
 
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
+// @grant        GM_info
 // ==/UserScript==
 
 (function () {
@@ -38,12 +39,15 @@
   const logger = new CP_Logger("[CONVERTER]", isDebugModeEnabled);
   const storedParams = new CP_StoredParams(
     logger,
-    true,
-    100,
-    60,
-    100,
-    CP_Unit.massUnits[0].symbol,
-    CP_Unit.volumeUnits[0].symbol
+    {
+      version: GM_info?.version,
+      isMinimized: true,
+      positionTop: 100,
+      positionLeft: 60,
+      pickedQuantity: 100,
+      pickedMassUnit: CP_Unit.massUnits[0].symbol,
+      pickedVolumeUnit: CP_Unit.volumeUnits[0].symbol
+    }
   );
   const ui = new CP_UserInterface(
     storedParams,
@@ -71,6 +75,12 @@
   main();
 
   function main() {
+    // Reset stored params if the version is different
+    if (GM_info?.version !== storedParams.version) {
+      logger.info("Resetting stored params (new version)");
+      storedParams.reset();
+    }
+
     // Init styles
     GM_addStyle(GM_getResourceText("styles"));
 

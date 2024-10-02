@@ -1,6 +1,27 @@
-class CP_StoredParams {
+class CP_BaseStoredParams {
+  /** @type {string} */
+  version;
+  /** @type {boolean} */
+  isMinimized;
+  /** @type {number} */
+  positionTop;
+  /** @type {number} */
+  positionLeft;
+  /** @type {number} */
+  pickedQuantity;
+  /** @type {string} */
+  pickedMassUnit;
+  /** @type {string} */
+  pickedVolumeUnit;
+}
+
+class CP_StoredParams extends CP_BaseStoredParams {
+  /** @type {boolean} */
   #failedToSetCookies = false;
+  /** @type {CP_Logger} */
   #logger;
+  /** @type {CP_BaseStoredParams} */
+  #defaultValues;
 
   #setCookie(cname, cvalue, exdays = 400) {
     const d = new Date();
@@ -48,94 +69,52 @@ class CP_StoredParams {
     return this.#getCookie(this.#getCookieName(paramName));
   }
   #setter(paramName, val, setOnlyIfEmpty = false) {
-    if (!setOnlyIfEmpty || this.#getter(paramName) === "")
+    if (!setOnlyIfEmpty || this.#getter(paramName) === "") {
       this.#setCookie(this.#getCookieName(paramName), val);
+      if (this.#failedToSetCookies)
+        console.warn(`Stored param: ${paramName}=${val}`);
+    }
+  }
+
+  #setAll(values, setOnlyIfEmpty) {
+    for (let p of Object.getOwnPropertyNames(values)) {
+      this.#setter(p, values[p], setOnlyIfEmpty);
+    }
   }
 
   /**
    * @param {CP_Logger} logger
-   * @param {boolean} isMinimized
-   * @param {number} positionTop
-   * @param {number} positionLeft
-   * @param {number} pickedQuantity
-   * @param {string} pickedMassUnit
-   * @param {string} pickedVolumeUnit
+   * @param {CP_BaseStoredParams} defaultValues
    */
-  constructor(
-    logger,
-    isMinimized,
-    positionTop,
-    positionLeft,
-    pickedQuantity,
-    pickedMassUnit,
-    pickedVolumeUnit
-  ) {
+  constructor(logger, defaultValues) {
+    super();
+
     this.#logger = logger;
-    this.isMinimizedLazy = isMinimized;
-    this.positionTopLazy = positionTop;
-    this.positionLeftLazy = positionLeft;
-    this.pickedQuantityLazy = pickedQuantity;
-    this.pickedMassUnitLazy = pickedMassUnit;
-    this.pickedVolumeUnitLazy = pickedVolumeUnit;
+    this.#defaultValues = defaultValues;
+    this.#setAll(defaultValues, true);
+
+    for (let p of Object.getOwnPropertyNames(defaultValues)) {
+      delete this[p];
+
+      let g;
+      if (typeof defaultValues[p] === "boolean") {
+        g = () => this.#getter(p) === "true";
+      } else {
+        g = () => this.#getter(p);
+      }
+
+      Object.defineProperty(this, p, {
+        get() {
+          return g(p);
+        },
+        set(value) {
+          this.#setter(p, value);
+        },
+      });
+    }
   }
 
-  get isMinimized() {
-    return this.#getter("isMinimized") === "true";
-  }
-  set isMinimized(val) {
-    this.#setter("isMinimized", val);
-  }
-  set isMinimizedLazy(val) {
-    this.#setter("isMinimized", val, true);
-  }
-
-  get positionTop() {
-    return this.#getter("positionTop");
-  }
-  set positionTop(val) {
-    this.#setter("positionTop", val);
-  }
-  set positionTopLazy(val) {
-    this.#setter("positionTop", val, true);
-  }
-
-  get positionLeft() {
-    return this.#getter("positionLeft");
-  }
-  set positionLeft(val) {
-    this.#setter("positionLeft", val);
-  }
-  set positionLeftLazy(val) {
-    this.#setter("positionLeft", val, true);
-  }
-
-  get pickedQuantity() {
-    return this.#getter("pickedQuantity");
-  }
-  set pickedQuantity(val) {
-    this.#setter("pickedQuantity", val);
-  }
-  set pickedQuantityLazy(val) {
-    this.#setter("pickedQuantity", val, true);
-  }
-
-  get pickedMassUnit() {
-    return this.#getter("pickedMassUnit");
-  }
-  set pickedMassUnit(val) {
-    this.#setter("pickedMassUnit", val);
-  }
-  set pickedMassUnitLazy(val) {
-    this.#setter("pickedMassUnit", val, true);
-  }
-
-  get pickedVolumeUnit() {
-    return this.#getter("pickedVolumeUnit");
-  }
-  set pickedVolumeUnit(val) {
-    this.#setter("pickedVolumeUnit", val);
-  }
-  set pickedVolumeUnitLazy(val) {
-    this.#setter("pickedVolumeUnit", val, true);
+  reset() {
+    this.#setAll(this.#defaultValues, false);
   }
 }
