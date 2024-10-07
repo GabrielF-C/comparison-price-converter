@@ -5,11 +5,13 @@
 // @icon         https://img.icons8.com/?size=100&id=47442&format=png&color=40C057
 // @namespace    https://github.com/GabrielF-C/comparison-price-converter
 
-// @version      20241001_233459
+// @version      20241006_212139
 // @downloadURL  https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
 // @updateURL    https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
 
 // @resource     styles https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/css/styles.css
+
+// @require      https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js
 
 // @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/logger.js
 // @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/drag-and-drop.js
@@ -35,6 +37,13 @@
 
 (function () {
   "use strict";
+
+  (async () => {
+    const worker = await Tesseract.createWorker('eng');
+    const ret = await worker.recognize('https://metrocommonapi.blob.core.windows.net/79266/images/79266_79266_P2_NAT_3_72.jpeg');
+    console.log(ret.data.text);
+    await worker.terminate();
+  })();
 
   const logger = new CP_Logger("[CONVERTER]", isDebugModeEnabled);
   const storedParams = new CP_StoredParams(
