@@ -7,6 +7,7 @@ class CP_UserInterface {
   #onVolumeUnitChange;
   #onMinimize;
 
+  elems = [];
   displayElem;
 
   get itemTitleElem() {
@@ -50,6 +51,7 @@ class CP_UserInterface {
     this.displayElem.append(this.#makeUnitPicker());
 
     document.body.append(this.displayElem);
+    this.elems.push(this.displayElem);
   }
 
   toggleUnitPicker() {
@@ -121,6 +123,9 @@ class CP_UserInterface {
       "Survolez un prix pour convertir (ex: 4,56 $ / 1 lb)\n\nCliquez cette zone avec le bouton droit de la souris pour afficher les options\n\nVous pouvez drag&drop cette zone n'importe où sur la page";
     div.style.top = `${this.#initialState.positionTop}px`;
     div.style.left = `${this.#initialState.positionLeft}px`;
+
+    this.elems.push(div);
+
     return div;
   }
 
@@ -130,6 +135,9 @@ class CP_UserInterface {
     if (this.#initialState.isMinimized) {
       p.classList.add("hidden");
     }
+
+    this.elems.push(p);
+
     return p;
   }
 
@@ -139,6 +147,9 @@ class CP_UserInterface {
       span.classList.add("hidden");
     }
     span.innerText = this.displayElem.title;
+
+    this.elems.push(span);
+
     return span;
   }
 
@@ -150,6 +161,9 @@ class CP_UserInterface {
     }
     img.src =
       "https://img.icons8.com/?size=100&id=47442&format=png&color=40C057";
+
+    this.elems.push(img);
+
     return img;
   }
 
@@ -180,6 +194,8 @@ class CP_UserInterface {
     unitPickerElem.append(document.createElement("hr"));
     unitPickerElem.append(this.#makeMinimizeButton());
 
+    this.elems.push(unitPickerElem);
+
     return unitPickerElem;
   }
 
@@ -200,6 +216,8 @@ class CP_UserInterface {
     input.step = 10;
     input.addEventListener("change", (e) => this.#onQuantityChange(e, input));
     div.append(input);
+
+    this.elems.push(div);
 
     return div;
   }
@@ -235,6 +253,8 @@ class CP_UserInterface {
       div.append(label);
     }
 
+    this.elems.push(wrapperElem);
+
     return wrapperElem;
   }
 
@@ -244,6 +264,9 @@ class CP_UserInterface {
     btn.type = "button";
     btn.innerText = "Minimiser";
     btn.addEventListener("click", this.#onMinimize);
+
+    this.elems.push(btn);
+
     return btn;
   }
 }

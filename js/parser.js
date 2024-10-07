@@ -6,6 +6,8 @@ class CP_ComparisonPriceParser {
   #itemTitleCommonAncestorSelector;
   #itemTitleCommonAncestorDistance;
   #itemTitleSelector;
+  #excludedElements;
+  #imgToTextAsync;
 
   /**
    * @param {RegExp} cpStringRegExp
@@ -15,6 +17,7 @@ class CP_ComparisonPriceParser {
    * @param {string} itemTitleCommonAncestorSelector
    * @param {number} itemTitleCommonAncestorDistance
    * @param {string} itemTitleSelector
+   * @param {Function} imgToTextAsync
    */
   constructor(
     cpStringRegExp,
@@ -23,7 +26,9 @@ class CP_ComparisonPriceParser {
     maxChildRecursionLevel,
     itemTitleCommonAncestorSelector,
     itemTitleCommonAncestorDistance,
-    itemTitleSelector
+    itemTitleSelector,
+    excludedElements,
+    imgToTextAsync
   ) {
     this.#cpStringRegExp = cpStringRegExp;
     this.#cpNumbersRegExp = cpNumbersRegExp;
@@ -32,6 +37,8 @@ class CP_ComparisonPriceParser {
     this.#itemTitleCommonAncestorSelector = itemTitleCommonAncestorSelector;
     this.#itemTitleCommonAncestorDistance = itemTitleCommonAncestorDistance;
     this.#itemTitleSelector = itemTitleSelector;
+    this.#excludedElements = excludedElements;
+    this.#imgToTextAsync = imgToTextAsync;
   }
 
   /**
@@ -40,14 +47,27 @@ class CP_ComparisonPriceParser {
    * @param {HTMLElement[]?} visitedElems
    * @returns { { price: number, quantity: number, quantityUnit: string, element: HTMLElement, itemTitle: string|false }[] | false } List of comparison prices or false if parsing failed
    */
-  parseComparisonPricesFromElem(elem, recursionLevel = 1, visitedElems = []) {
+  async parseComparisonPricesFromElem(
+    elem,
+    recursionLevel = 1,
+    visitedElems = []
+  ) {
     let comparisonPrices = false;
 
-    if (elem && !visitedElems.includes(elem)) {
+    if (
+      elem &&
+      !visitedElems.includes(elem) &&
+      !this.#excludedElements.includes(elem)
+    ) {
       visitedElems.push(elem);
 
-      // Try to parse the string
-      comparisonPrices = this.parseComparisonPricesFromString(elem.innerText);
+      if (elem instanceof HTMLImageElement) {
+        // Try to parse the text in the image
+        comparisonPrices = await this.parseComparisonPricesFromImg(elem);
+      } else {
+        // Try to parse the string
+        comparisonPrices = this.parseComparisonPricesFromString(elem.innerText);
+      }
 
       if (comparisonPrices) {
         let itemTitle = this.#findItemTitleForCP(elem);
@@ -59,7 +79,7 @@ class CP_ComparisonPriceParser {
         // If parsing failed, try checking parents and children
         if (recursionLevel <= this.#maxParentRecursionLevel) {
           // Check parents
-          comparisonPrices = this.parseComparisonPricesFromElem(
+          comparisonPrices = await this.parseComparisonPricesFromElem(
             elem.parentElement,
             recursionLevel + 1
           );
@@ -71,7 +91,7 @@ class CP_ComparisonPriceParser {
         ) {
           // Check children
           for (let child of elem.children) {
-            comparisonPrices = this.parseComparisonPricesFromElem(
+            comparisonPrices = await this.parseComparisonPricesFromElem(
               child,
               recursionLevel + 1
             );
@@ -86,6 +106,12 @@ class CP_ComparisonPriceParser {
     return comparisonPrices;
   }
 
+  async parseComparisonPricesFromImg(imgElem) {
+    return this.parseComparisonPricesFromString(
+      await this.#imgToTextAsync(imgElem)
+    );
+  }
+
   /**
    * @param {string} str
    * @returns { { price: number, quantity: number, quantityUnit: string }[] | false } List of comparison prices or false if parsing failed
@@ -94,7 +120,7 @@ class CP_ComparisonPriceParser {
     let comparisonPrices = false;
 
     // Validate string
-    if (str?.length && str.length <= 30) {
+    if (str?.length && str.length <= 200) {
       let matches = str.match(this.#cpStringRegExp);
 
       if (matches?.length) {
@@ -103,6 +129,7 @@ class CP_ComparisonPriceParser {
           if (m.includes("¢")) {
             m = `0.${m}`;
           }
+
           m = m
             .replace(/-|¢|\$|\s+/g, "")
             .replace(/,/g, ".")
@@ -132,7 +159,6 @@ class CP_ComparisonPriceParser {
         }
       }
     }
-
     return comparisonPrices;
   }
 

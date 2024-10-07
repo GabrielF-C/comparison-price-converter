@@ -5,7 +5,7 @@
 // @icon         https://img.icons8.com/?size=100&id=47442&format=png&color=40C057
 // @namespace    https://github.com/GabrielF-C/comparison-price-converter
 
-// @version      20241006_220849
+// @version      20241006_221128
 // @downloadURL  https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
 // @updateURL    https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
 
@@ -15,6 +15,7 @@
 
 // @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/logger.js
 // @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/drag-and-drop.js
+// @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/img-ocr.js
 // @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/parser.js
 // @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/regular-expressions.js
 // @require      https://raw.githubusercontent.com/GabrielF-C/comparison-price-converter/main/js/site-specific-params.js
@@ -38,41 +39,16 @@
 (function () {
   "use strict";
 
-  function imgToDatURL(img) {
-    let canvas = document.createElement("canvas");
-    let context = canvas.getContext("2d");
-
-    canvas.width = img.width;
-    canvas.height = img.height;
-
-    context.drawImage(img, 0, 0, img.width, img.height);
-
-    return canvas.toDataURL();
-  }
-
-  (async () => {
-    let img = document.querySelector("img.product-block-image");
-    let imgDataURL = imgToDatURL(img);
-
-    const worker = await Tesseract.createWorker('eng');
-    const ret = await worker.recognize(imgDataURL);
-    console.log(ret.data.text);
-    await worker.terminate();
-  })();
-
   const logger = new CP_Logger("[CONVERTER]", isDebugModeEnabled);
-  const storedParams = new CP_StoredParams(
-    logger,
-    {
-      version: GM_info?.script?.version,
-      isMinimized: true,
-      positionTop: 100,
-      positionLeft: 60,
-      pickedQuantity: 100,
-      pickedMassUnit: CP_Unit.massUnits[0].symbol,
-      pickedVolumeUnit: CP_Unit.volumeUnits[0].symbol
-    }
-  );
+  const storedParams = new CP_StoredParams(logger, {
+    version: GM_info?.script?.version,
+    isMinimized: true,
+    positionTop: 100,
+    positionLeft: 60,
+    pickedQuantity: 100,
+    pickedMassUnit: CP_Unit.massUnits[0].symbol,
+    pickedVolumeUnit: CP_Unit.volumeUnits[0].symbol,
+  });
   const ui = new CP_UserInterface(
     storedParams,
     CP_Unit.massUnits,
@@ -86,6 +62,7 @@
     isDebugModeEnabled() ? "test" : window.location.hostname
   );
   const regExps = new CP_RegExps(CP_Unit.allUnits.map((u) => u.symbol));
+  const imgOCR = new CP_ImageOCR();
   const cpParser = new CP_ComparisonPriceParser(
     regExps.comparisonPriceString,
     regExps.comparisonPriceNumbers,
@@ -93,7 +70,9 @@
     siteSpecificParams.maxChildRecursionLevel,
     siteSpecificParams.itemTitleCommonAncestorSelector,
     siteSpecificParams.itemTitleCommonAncestorDistance,
-    siteSpecificParams.itemTitleSelector
+    siteSpecificParams.itemTitleSelector,
+    ui.elems,
+    (elem) => imgOCR.imgToTextAsync(elem)
   );
 
   main();
@@ -117,51 +96,62 @@
 
     // Init UI improvements
     if (siteSpecificParams.applyUIImprovements) {
-      setInterval(() => {
-        siteSpecificParams.applyUIImprovements();
-      }, 2000);
+      setInterval(onApplyUIImprovements, 2000);
     }
 
     // Init listeners
-    document.addEventListener("mouseover", (e) => {
-      if (ui.displayElem.contains(e.target) || storedParams.isMinimized) {
-        return;
+    document.addEventListener("mouseover", async (e) => await onMouseOver(e));
+    ui.displayElem.addEventListener("contextmenu", onContextMenu, false);
+  }
+
+  function onApplyUIImprovements() {
+    siteSpecificParams.applyUIImprovements();
+  }
+
+  const taskIds = [];
+
+  async function onMouseOver(e) {
+    if (ui.displayElem.contains(e.target) || storedParams.isMinimized) {
+      return;
+    }
+
+    endTasks();
+    let id = setTimeout(processMouseOverTarget, 0, e.target);
+    taskIds.push(id);
+  }
+
+  function endTasks() {
+    for (let taskId of taskIds) clearTimeout(taskId);
+  }
+
+  async function processMouseOverTarget(target) {
+    let comparisonPrices = await cpParser.parseComparisonPricesFromElem(target);
+    if (comparisonPrices) {
+      for (let i = 0; i < comparisonPrices.length; ++i) {
+        comparisonPrices[i] = convertComparisonPrice(comparisonPrices[i]);
       }
 
-      let comparisonPrices = cpParser.parseComparisonPricesFromElem(e.target);
-      if (comparisonPrices) {
-        for (let i = 0; i < comparisonPrices.length; ++i) {
-          comparisonPrices[i] = convertComparisonPrice(comparisonPrices[i]);
-        }
-
-        ui.showComparisonPrices(comparisonPrices);
-        ui.removeAllHighlights();
-        for (let cp of comparisonPrices) {
-          ui.highlightElem(cp.element);
-        }
+      ui.showComparisonPrices(comparisonPrices);
+      ui.removeAllHighlights();
+      for (let cp of comparisonPrices) {
+        ui.highlightElem(cp.element);
       }
-    });
+    }
+  }
 
-    ui.displayElem.addEventListener(
-      "contextmenu",
-      (e) => {
-        e.preventDefault();
+  function onContextMenu(e) {
+    e.preventDefault();
 
-        if (storedParams.isMinimized) {
-          ui.displayElem
-            .querySelector(".item-title")
-            .classList.remove("hidden");
-          ui.priceDiplayElem.classList.remove("hidden");
-          ui.displayElem.querySelector("img").classList.add("hidden");
-          storedParams.isMinimized = false;
-        } else {
-          ui.toggleUnitPicker();
-        }
+    if (storedParams.isMinimized) {
+      ui.displayElem.querySelector(".item-title").classList.remove("hidden");
+      ui.priceDiplayElem.classList.remove("hidden");
+      ui.displayElem.querySelector("img").classList.add("hidden");
+      storedParams.isMinimized = false;
+    } else {
+      ui.toggleUnitPicker();
+    }
 
-        return false;
-      },
-      false
-    );
+    return false;
   }
 
   function onQuantityChange(e, input) {

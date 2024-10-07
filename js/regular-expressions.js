@@ -16,7 +16,7 @@ class CP_RegExps {
 
   #makeComparisonPriceStringRegExp(unitsMatchString) {
     return new RegExp(
-      `\\d+?[,.]?\\d+?\\D*?/\\s*?\\d*?.*?(${unitsMatchString})`,
+      `\\d+?[,.]?\\d+?\\D*?\/\\s*?\\d*?.*?(${unitsMatchString})`,
       "gi"
     );
   }

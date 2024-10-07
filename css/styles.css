@@ -63,6 +63,11 @@
   background-color: #beffbe !important;
 }
 
+img.selected-for-conversion {
+  border: 5px solid #beffbe;
+  filter: drop-shadow(2px 4px 6px black);
+}
+
 .minimize-btn {
   cursor: pointer !important;
   padding: 10px;
