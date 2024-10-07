@@ -5,7 +5,7 @@
 // @icon         https://img.icons8.com/?size=100&id=47442&format=png&color=40C057
 // @namespace    https://github.com/GabrielF-C/comparison-price-converter
 
-// @version      20241006_212139
+// @version      20241006_220849
 // @downloadURL  https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
 // @updateURL    https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
 
@@ -38,9 +38,24 @@
 (function () {
   "use strict";
 
+  function imgToDatURL(img) {
+    let canvas = document.createElement("canvas");
+    let context = canvas.getContext("2d");
+
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    context.drawImage(img, 0, 0, img.width, img.height);
+
+    return canvas.toDataURL();
+  }
+
   (async () => {
+    let img = document.querySelector("img.product-block-image");
+    let imgDataURL = imgToDatURL(img);
+
     const worker = await Tesseract.createWorker('eng');
-    const ret = await worker.recognize('https://metrocommonapi.blob.core.windows.net/79266/images/79266_79266_P2_NAT_3_72.jpeg');
+    const ret = await worker.recognize(imgDataURL);
     console.log(ret.data.text);
     await worker.terminate();
   })();
