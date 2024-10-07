@@ -76,7 +76,7 @@ class CP_ImageOCR {
 
       context.drawImage(imgElem, 0, 0, canvas.width, canvas.height);
 
-      data = canvas.toDataURL();
+      const data = canvas.toDataURL();
       if (data) {
         this.#dataCache.set(imgElem, data);
       }
