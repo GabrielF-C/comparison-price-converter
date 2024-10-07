@@ -72,7 +72,7 @@ class CP_StoredParams extends CP_BaseStoredParams {
     if (!setOnlyIfEmpty || this.#getter(paramName) === "") {
       this.#setCookie(this.#getCookieName(paramName), val);
       if (this.#failedToSetCookies)
-        console.warn(`Stored param: ${paramName}=${val}`);
+        this.#logger.warn(`Stored param: ${paramName}=${val}`);
     }
   }
 
