@@ -5,7 +5,7 @@
 // @icon         https://img.icons8.com/?size=100&id=47442&format=png&color=40C057
 // @namespace    https://github.com/GabrielF-C/comparison-price-converter
 
-// @version      20241007_221655
+// @version      20241007_222504
 // @downloadURL  https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
 // @updateURL    https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
 
@@ -36,13 +36,15 @@
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
 // @grant        GM_info
-// @grant        GM.xmlhttpRequest
+// @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
 (function () {
   "use strict";
 
-  testCORS();
+  if (initTestScript) {
+    initTestScript(GM_addStyle, GM_getResourceText, GM_info, GM_xmlhttpRequest);
+  }
 
   const logger = new CP_Logger("[CONVERTER]", isDebugModeEnabled);
   const storedParams = new CP_StoredParams(logger, {
@@ -280,13 +282,7 @@
         return makeParamsForGiantTiger();
 
       case "test":
-        return new CP_SiteSpecificParams(
-          2,
-          3,
-          `.product`,
-          7,
-          `.product-title`
-        );
+        return new CP_SiteSpecificParams(2, 3, `.product`, 7, `.product-title`);
 
       default:
         throw new Error(
