@@ -5,7 +5,7 @@
 // @icon         https://img.icons8.com/?size=100&id=47442&format=png&color=40C057
 // @namespace    https://github.com/GabrielF-C/comparison-price-converter
 
-// @version      20241007_215646
+// @version      20241007_220541
 // @downloadURL  https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
 // @updateURL    https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
 
@@ -186,7 +186,7 @@
   }
 
   function isDebugModeEnabled() {
-    return typeof CONVERTER_TEST !== "undefined";
+    return window.location.hostname === "127.0.0.1";
   }
 
   function convertComparisonPrice(cp) {
@@ -278,7 +278,13 @@
         return makeParamsForGiantTiger();
 
       case "test":
-        return CONVERTER_TEST.siteSpecificParams;
+        return new CP_SiteSpecificParams(
+          2,
+          3,
+          `.product`,
+          7,
+          `.product-title`
+        );
 
       default:
         throw new Error(
