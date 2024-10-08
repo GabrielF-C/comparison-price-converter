@@ -5,7 +5,7 @@
 // @icon         https://img.icons8.com/?size=100&id=47442&format=png&color=40C057
 // @namespace    https://github.com/GabrielF-C/comparison-price-converter
 
-// @version      20241007_220541
+// @version      20241007_221539
 // @downloadURL  https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
 // @updateURL    https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
 
@@ -41,6 +41,8 @@
 
 (function () {
   "use strict";
+
+  testCORS();
 
   const logger = new CP_Logger("[CONVERTER]", isDebugModeEnabled);
   const storedParams = new CP_StoredParams(logger, {
