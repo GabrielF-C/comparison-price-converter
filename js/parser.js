@@ -62,7 +62,7 @@ class CP_ComparisonPriceParser {
       visitedElems.push(elem);
 
       // TODO: Reactivate img parsing
-      if (false || elem instanceof HTMLImageElement) {
+      if (false && elem instanceof HTMLImageElement) {
         // Try to parse the text in the image
         comparisonPrices = await this.parseComparisonPricesFromImg(elem);
       } else {
