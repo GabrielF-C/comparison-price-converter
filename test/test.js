@@ -8,10 +8,12 @@ function initTestScript(
     const url = `https://product-images.metro.ca/images/hc6/h6e/11109279563806.jpg`;
 
     console.log(GM_xmlhttpRequest);
-    // GM_xmlhttpRequest({ url: url })
-    //   .then((res) => res.blob())
-    //   .then((blob) => console.log(URL.createObjectURL(blob)))
-    //   .catch((e) => console.error(e));
+    GM_xmlhttpRequest({
+      url: url,
+      onload: (res) => {
+        console.log(res.responseText);
+      },
+    });
   }
 
   testCORS();
