@@ -5,7 +5,7 @@
 // @icon         https://img.icons8.com/?size=100&id=47442&format=png&color=40C057
 // @namespace    https://github.com/GabrielF-C/comparison-price-converter
 
-// @version      20241019_153902
+// @version      20241019_154224
 // @downloadURL  https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
 // @updateURL    https://github.com/GabrielF-C/comparison-price-converter/raw/main/script.user.js
 
@@ -42,7 +42,7 @@
 (function () {
   "use strict";
 
-  if (initTestScript !== undefined) {
+  if (typeof(initTestScript) === typeof(Function)) {
     initTestScript(GM_addStyle, GM_getResourceText, GM_info, GM_xmlhttpRequest);
   }
 
